@@ -23,6 +23,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [hasWebGL, setHasWebGL] = useState(true);
 
   // States to communicate interaction back
   const [activeBuildingIndex, setActiveBuildingIndex] = useState<number | null>(null);
@@ -30,7 +31,21 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current) return;
 
-    const width = containerRef.current.clientWidth;
+    // Fast-path pre-flight context validation
+    try {
+      const testCanvas = document.createElement('canvas');
+      const testGl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+      if (!testGl) {
+        setHasWebGL(false);
+        return;
+      }
+    } catch (e) {
+      setHasWebGL(false);
+      return;
+    }
+
+    try {
+      const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
 
     // --- SCENE & FOG ---
@@ -695,6 +710,7 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
       cityGroup.rotation.y = Math.sin(elapsedTime * 0.05) * 0.08;
       buildingMeshes.forEach((mesh, index) => {
         const bl = selectedCityBuildings[index];
+        if (!bl) return;
         if (mesh.material && 'emissiveIntensity' in mesh.material) {
           const material = mesh.material as THREE.MeshPhysicalMaterial;
           if (bl.isComingSoon) {
@@ -792,7 +808,35 @@ export const ThreeCanvas: React.FC<ThreeCanvasProps> = ({
 
       renderer.dispose();
     };
+    } catch (error) {
+      console.warn("WebGL initialization failed or context went inactive:", error);
+      setHasWebGL(false);
+    }
   }, [activeSection, selectedCityBuildings]);
+
+  if (!hasWebGL) {
+    return (
+      <div className="absolute inset-0 w-full h-full bg-[#030303] overflow-hidden flex flex-col justify-center items-center" id="three-canvas-fallback">
+        {/* Modern Cyber Starfield Fallback (Non-WebGL friendly) */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,106,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,106,0,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-35" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,#030303_100%)] pointer-events-none opacity-90 mix-blend-multiply" />
+        
+        {/* Ambient atmospheric lighting blobs */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-600/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] bg-blue-600/5 blur-[90px] rounded-full pointer-events-none" />
+
+        {/* Dynamic flickering cosmic star grids */}
+        <div className="absolute inset-0 opacity-40 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse [animation-duration:3s]" />
+          <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-amber-400 rounded-full animate-ping [animation-duration:5s]" />
+          <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse [animation-duration:4s]" />
+          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-white rounded-full animate-ping [animation-duration:6s]" />
+          <div className="absolute bottom-1/3 right-1/4 w-1 h-1 bg-orange-400 rounded-full animate-pulse [animation-duration:3.5s]" />
+          <div className="absolute top-1/2 left-1/5 w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse [animation-duration:4.5s]" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div ref={containerRef} className="absolute inset-0 w-full h-full overflow-hidden" id="three-canvas-root">
