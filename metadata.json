@@ -1,0 +1,6 @@
+{
+  "name": "ATP Startups",
+  "description": "Hyper-immersive, 3D interactive portal for Anantapur's futuristic startup ecosystem.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
