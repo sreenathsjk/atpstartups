@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ActiveSection, 
@@ -84,6 +84,15 @@ export const SectionOverlay: React.FC<SectionOverlayProps> = ({
       }, 10);
       return () => clearInterval(interval);
     }
+  }, [activeSection]);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+    window.scrollTo(0, 0);
   }, [activeSection]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -228,7 +237,10 @@ Founding Sovereign Key: ${key}`;
     <div className="absolute inset-0 z-30 pointer-events-none flex flex-col justify-between p-6 sm:p-12 select-none font-sans overflow-hidden" id="ui-metaverse-overlay">
       
       {/* -------------------- MAIN OVERLAYS (MIDDLE LAYERS) -------------------- */}
-      <div className="flex-1 w-full flex items-start sm:items-center relative overflow-y-auto max-h-[75vh] sm:max-h-none scrollbar-none py-12">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 w-full flex items-start sm:items-center relative overflow-y-auto max-h-[75vh] sm:max-h-none scrollbar-none py-12"
+      >
         <AnimatePresence mode="wait">
           
           {/* ----- 1. HERO HUB OVERLAY ----- */}
