@@ -26,6 +26,13 @@ export interface CityBuilding {
   gridZ: number;
   height: number;
   color: string;
+  founderImage?: string;
+  idea?: string;
+  problem?: string;
+  solution?: string;
+  longDescription?: string;
+  tags?: string[];
+  metricsDetail?: { label: string; value: string }[];
 }
 
 export interface InteractiveModule {

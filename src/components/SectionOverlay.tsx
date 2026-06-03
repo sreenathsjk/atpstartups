@@ -235,62 +235,175 @@ Founding Sovereign Key: ${key}`;
           {activeSection === 'hero' && (
             <motion.div 
               key="hero"
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="max-w-xl text-left pointer-events-auto"
+              className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pointer-events-auto px-4 lg:px-0"
             >
-              {/* Regional tag */}
-              <div className="flex items-center gap-2 mb-4 text-[10px] uppercase tracking-[0.35em] text-orange-500 font-mono">
-                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-                <span>The Sovereign Startup Crucible</span>
+              {/* Left Panel: Brand info */}
+              <div className="lg:col-span-5 space-y-6 text-left">
+                {/* Regional tag */}
+                <div className="flex items-center gap-2 mb-2 text-[10px] uppercase tracking-[0.35em] text-orange-500 font-mono">
+                  <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                  <span>The Sovereign Startup Crucible</span>
+                </div>
+
+                {/* Dynamic Title */}
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none text-white font-light uppercase">
+                  BUILDING <br />
+                  <span className="text-orange-500 font-medium font-sans filter drop-shadow-[0_0_20px_rgba(255,106,0,0.25)]">ANANTAPUR'S</span><br />
+                  STARTUP FUTURE
+                </h2>
+
+                <p className="text-sm font-light text-white/50 tracking-wide leading-relaxed max-w-md">
+                  Unlocking unprecedented talent densification, hyper-efficient developer units, and institutional seed capital at the absolute intersection of South India's core tech corridors.
+                </p>
+
+                {/* Magnetic Interactive CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    onClick={() => handleCTA('community')}
+                    className="px-5 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs uppercase tracking-[0.2em] font-mono border border-orange-400/20 shadow-[0_0_25px_rgba(255,106,0,0.25)] hover:shadow-[0_0_40px_rgba(255,106,0,0.45)] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Join Community</span>
+                    <ArrowRight className="w-4 h-4 translate-y-[-0.5px]" />
+                  </button>
+
+                  <button
+                    onClick={() => handleCTA('city')}
+                    className="px-5 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs uppercase tracking-[0.2em] font-mono border border-white/10 hover:border-orange-500/30 shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Explore Ecosystem</span>
+                    <Rocket className="w-4 h-4 text-orange-500" />
+                  </button>
+                </div>
+
+                {/* Live scarcity dynamic stat overlay */}
+                <div className="pt-6 flex gap-8 border-t border-white/5 text-left max-w-md font-mono">
+                  <div>
+                    <span className="block text-2xl font-light text-white">{registeredCount}%</span>
+                    <span className="text-[9px] uppercase tracking-widest text-white/40">Founders Filled</span>
+                  </div>
+                  <div>
+                    <span className="block text-2xl font-light text-orange-500">12+</span>
+                    <span className="text-[9px] uppercase tracking-widest text-white/40">Incubated Labs</span>
+                  </div>
+                  <div>
+                    <span className="block text-2xl font-light text-white">$1.2M</span>
+                    <span className="text-[9px] uppercase tracking-widest text-white/40">Seed Capital Pool</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Dynamic Title */}
-              <h2 className="text-4xl sm:text-6xl tracking-tight leading-none text-white font-light uppercase mb-6">
-                BUILDING <br />
-                <span className="text-orange-500 font-medium font-sans filter drop-shadow-[0_0_20px_rgba(255,106,0,0.25)]">ANANTAPUR'S</span><br />
-                STARTUP FUTURE
-              </h2>
-
-              <p className="text-sm font-light text-white/50 tracking-wide leading-relaxed mb-8 max-w-md">
-                Unlocking unprecedented talent densification, hyper-efficient developer units, and institutional seed capital at the absolute intersection of South India's core tech corridors.
-              </p>
-
-              {/* Magnetic Interactive CTAs */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => handleCTA('community')}
-                  className="px-6 py-3.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs uppercase tracking-[0.2em] font-mono border border-orange-400/20 shadow-[0_0_25px_rgba(255,106,0,0.25)] hover:shadow-[0_0_40px_rgba(255,106,0,0.45)] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Join Community</span>
-                  <ArrowRight className="w-4 h-4 translate-y-[-0.5px]" />
-                </button>
-
-                <button
-                  onClick={() => handleCTA('city')}
-                  className="px-6 py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-lg text-xs uppercase tracking-[0.2em] font-mono border border-white/10 hover:border-orange-500/30 shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Explore Ecosystem</span>
-                  <Rocket className="w-4 h-4 text-orange-500" />
-                </button>
-              </div>
-
-              {/* Live scarcity dynamic stat overlay */}
-              <div className="mt-12 flex gap-8 border-t border-white/5 pt-6 text-left max-w-md font-mono">
-                <div>
-                  <span className="block text-2xl font-light text-white">{registeredCount}%</span>
-                  <span className="text-[9px] uppercase tracking-widest text-white/40">Founders Filled</span>
+              {/* Right Panel: Sovereign Founders Registry */}
+              <div className="lg:col-span-7 bg-black/85 backdrop-blur-2xl border border-white/10 p-5 rounded-xl space-y-4 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 text-[8px] font-mono tracking-widest text-[#ffcc00]/40">
+                  SECURE_METAV_REGISTRY_v1.5
                 </div>
-                <div>
-                  <span className="block text-2xl font-light text-orange-500">12+</span>
-                  <span className="text-[9px] uppercase tracking-widest text-white/40">Incubated Labs</span>
+
+                <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
+                  <div>
+                    <h3 className="text-xs font-mono uppercase tracking-[0.25em] text-[#ffcc00] font-bold flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#ffcc00] animate-pulse" />
+                      Sovereign Founders Registry
+                    </h3>
+                    <p className="text-[8px] font-mono text-white/30 uppercase mt-0.5">// Featured Incubation Nodes</p>
+                  </div>
+                  <span className="text-[9px] font-mono border border-orange-500/20 bg-orange-500/5 px-2 py-0.5 rounded text-[#ffcc00] font-bold uppercase tracking-wider">
+                    Active: 1 Node
+                  </span>
                 </div>
-                <div>
-                  <span className="block text-2xl font-light text-white">$1.2M</span>
-                  <span className="text-[9px] uppercase tracking-widest text-white/40">Seed Capital Pool</span>
-                </div>
+
+                {/* Spotlight Founder Node: Kummara Sreenath */}
+                {(() => {
+                  const bld = INITIAL_CITY_BUILDINGS.find(b => b.id === 'bld-atoz') || cityBuildings.find(b => b.id === 'bld-atoz');
+                  return bld ? (
+                    <div 
+                      key={bld.id}
+                      onClick={() => {
+                        audio.playPulse();
+                        onSelectBuilding(bld);
+                      }}
+                      className="bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-[#ffcc00]/30 rounded-xl p-5 transition-all duration-300 flex flex-col justify-between hover:shadow-[0_4px_30px_rgba(255,204,0,0.06)] cursor-pointer group relative overflow-hidden space-y-4"
+                    >
+                      {/* Highlights */}
+                      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#ffcc00]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      
+                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                        {/* Profile Photo */}
+                        <div className="relative w-full h-56 sm:w-36 sm:h-44 rounded-lg overflow-hidden border border-white/10 group-hover:border-[#ffcc00]/40 transition-colors shrink-0 bg-white/5 shadow-md">
+                          <img 
+                            src={bld.founderImage || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=200&h=240"} 
+                            alt="Kummara Sreenath" 
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-2 right-2 z-10 text-[6.5px] border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 px-1 hover:border-cyan-400 rounded font-bold uppercase tracking-widest backdrop-blur-md">
+                            VERIFIED
+                          </div>
+                        </div>
+
+                        {/* Founder details */}
+                        <div className="space-y-3 min-w-0 flex-1 text-left">
+                          <div>
+                            <span className="text-[8px] font-mono text-[#ffcc00] border border-[#ffcc00]/20 bg-[#ffcc00]/5 px-1.5 py-0.5 rounded uppercase tracking-wider font-semibold">
+                              SaaS & Consumer Tech
+                            </span>
+                            <h4 className="text-base font-bold text-white tracking-wide mt-2">
+                              Kummara Sreenath
+                            </h4>
+                            <p className="text-[9px] font-mono text-white/40 uppercase tracking-widest mt-0.5">
+                              Founder, AtoZ ServiceHub
+                            </p>
+                          </div>
+
+                          <p className="text-xs font-sans text-white/70 leading-relaxed font-light">
+                            A service providers app, that helps to get their required providers in time within minutes of their required service.
+                          </p>
+
+                          <div className="flex flex-wrap gap-1.5 pt-0.5">
+                            <span className="text-[8px] font-mono text-cyan-400 border border-cyan-400/10 bg-cyan-400/5 px-2 py-0.5 rounded uppercase tracking-widest font-semibold">
+                              Hyperlocal Routing
+                            </span>
+                            <span className="text-[8px] font-mono text-orange-400 border border-orange-400/10 bg-orange-400/5 px-2 py-0.5 rounded uppercase tracking-widest font-semibold">
+                              Sovereign Protocol
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Technical and Growth Metrics Bar */}
+                      <div className="grid grid-cols-2 gap-3 pt-1">
+                        <div className="bg-black/40 border border-white/5 rounded-lg p-2.5">
+                          <span className="text-[7.5px] font-mono text-white/40 uppercase tracking-wider block mb-1">GROWTH INDEX</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-[#ffcc00]">94% Growth Rate</span>
+                            <span className="text-[8px] text-emerald-400">Stable</span>
+                          </div>
+                        </div>
+                        <div className="bg-black/40 border border-[#ffcc00]/10 rounded-lg p-2.5">
+                          <span className="text-[7.5px] font-mono text-white/40 uppercase tracking-wider block mb-1">OPERATIONAL CELL GRID</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-white">Anantapur Hub</span>
+                            <span className="text-[8.5px] text-cyan-400 animate-pulse">● Active</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action footer */}
+                      <div className="pt-3.5 border-t border-white/5 flex items-center justify-between">
+                        <span className="text-[8px] font-mono tracking-wider text-white/30 uppercase">
+                          Instance: <span className="text-white font-bold">bld-atoz</span>
+                        </span>
+                        <span className="text-xs font-mono font-bold text-[#ffcc00] group-hover:text-white flex items-center gap-1 tracking-widest uppercase transition-colors">
+                          Inspect Node & Contact <ChevronRight className="w-3.5 h-3.5 translate-y-[0.2px] group-hover:translate-x-0.5 transition-transform" />
+                        </span>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+
               </div>
             </motion.div>
           )}
@@ -622,60 +735,26 @@ Founding Sovereign Key: ${key}`;
                 ))}
               </div>
 
-              {/* Selected building inspection drawer */}
+              {/* Selected building inspection info label */}
               <AnimatePresence mode="wait">
                 {selectedBuilding && (
                   <motion.div
-                    key={selectedBuilding.id}
-                    initial={{ opacity: 0, y: 15 }}
+                    key="sec-overlay-selected-bld-indicator"
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -15 }}
-                    className="p-5 rounded-lg border border-white/10 bg-black/80 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                    exit={{ opacity: 0, y: -10 }}
+                    className="p-3.5 rounded-lg border border-orange-500/10 bg-orange-500/[0.02] text-[10px] text-orange-400 font-mono flex items-center justify-between"
                   >
-                    {/* Color bar indicator */}
-                    <div 
-                      className="absolute top-0 left-0 right-0 h-[2px]" 
-                      style={{ backgroundColor: selectedBuilding.color }}
-                    />
-
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <h3 className="text-lg font-normal text-white">{selectedBuilding.name}</h3>
-                        <p className="text-[9px] font-mono uppercase tracking-widest text-white/40">
-                          {selectedBuilding.category} // FOUNDER: {selectedBuilding.founder.toUpperCase()}
-                        </p>
-                      </div>
-                      <button 
-                        onClick={() => {
-                          audio.playTick();
-                          onSelectBuilding(null);
-                        }}
-                        className="text-[10px] font-mono tracking-widest text-[#ca1111] hover:text-red-400 bg-red-950/20 px-2 py-1 rounded cursor-pointer transition-colors"
-                      >
-                        CLOSE_X
-                      </button>
-                    </div>
-
-                    <p className="text-xs text-white/60 leading-relaxed mb-4 font-mono">
-                      "{selectedBuilding.tagline}" — {selectedBuilding.description}
-                    </p>
-
-                    <div className="flex items-center justify-between border-t border-white/5 pt-3">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-3.5 h-3.5" style={{ color: selectedBuilding.color }} />
-                        <span className="text-[9px] font-mono text-white/50 uppercase">Capital Growth Level</span>
-                      </div>
-                      <div className="w-24 h-1.5 rounded-full bg-white/5 overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all duration-1000"
-                          style={{ 
-                            width: `${selectedBuilding.growth}%`,
-                            backgroundColor: selectedBuilding.color,
-                            boxShadow: `0 0 10px ${selectedBuilding.color}`
-                          }}
-                        />
-                      </div>
-                    </div>
+                    <span>🎯 SELECTED NODE: {selectedBuilding.name.toUpperCase()} / {selectedBuilding.founder.toUpperCase()}</span>
+                    <button
+                      onClick={() => {
+                        audio.playTick();
+                        onSelectBuilding(null);
+                      }}
+                      className="px-2 py-1 bg-orange-500/10 border border-orange-500/10 rounded text-[9px] font-semibold text-orange-400 hover:text-white transition-colors"
+                    >
+                      CLEAR_X
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { ActiveSection } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { ActiveSection, CityBuilding } from '../types';
+import { INITIAL_CITY_BUILDINGS } from '../data';
 import { audio } from './AudioEngine';
+import { DailyBriefingTicker } from './DailyBriefingTicker';
 import { 
   Compass, 
   Layers, 
@@ -16,7 +18,9 @@ import {
   Activity, 
   Instagram,
   Volume2,
-  VolumeX
+  VolumeX,
+  Search,
+  X
 } from 'lucide-react';
 
 interface OrbNavigationProps {
@@ -24,6 +28,8 @@ interface OrbNavigationProps {
   onSectionChange: (section: ActiveSection) => void;
   isMuted: boolean;
   onToggleMute: () => void;
+  onSelectBuilding?: (building: CityBuilding | null) => void;
+  onCategoryChange?: (category: string) => void;
 }
 
 interface NavNode {
@@ -39,8 +45,93 @@ export const OrbNavigation: React.FC<OrbNavigationProps> = ({
   onSectionChange,
   isMuted,
   onToggleMute,
+  onSelectBuilding,
+  onCategoryChange,
 }) => {
   const [hoveredNode, setHoveredNode] = useState<ActiveSection | null>(null);
+  
+  // Search HUD States
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // Close search dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const cleanQuery = searchQuery.trim().toLowerCase();
+
+  // Extract unique sectors
+  const ALL_SECTORS = Array.from(new Set(INITIAL_CITY_BUILDINGS.map(b => b.category)));
+
+  // Filter systems
+  const matchingStartups = cleanQuery === '' 
+    ? [] 
+    : INITIAL_CITY_BUILDINGS.filter(b => 
+        b.name.toLowerCase().includes(cleanQuery) || 
+        b.tagline.toLowerCase().includes(cleanQuery)
+      );
+
+  const matchingSectors = cleanQuery === '' 
+    ? [] 
+    : ALL_SECTORS.filter(sec => sec.toLowerCase().includes(cleanQuery));
+
+  const matchingFounders = cleanQuery === '' 
+    ? [] 
+    : INITIAL_CITY_BUILDINGS.filter(b => 
+        b.founder.toLowerCase() !== 'tbd' && 
+        b.founder.toLowerCase().includes(cleanQuery)
+      );
+
+  const totalResultsCount = matchingStartups.length + matchingSectors.length + matchingFounders.length;
+
+  // Nav actions
+  const handleSelectStartup = (bld: CityBuilding) => {
+    audio.playPulse();
+    onSectionChange('city');
+    onCategoryChange?.('all');
+    setTimeout(() => {
+      onSelectBuilding?.(bld);
+    }, 100);
+    setSearchQuery('');
+    setIsFocused(false);
+  };
+
+  const handleSelectSector = (sector: string) => {
+    audio.playPulse();
+    onSectionChange('city');
+    onCategoryChange?.(sector);
+    onSelectBuilding?.(null);
+    setSearchQuery('');
+    setIsFocused(false);
+  };
+
+  const handleSelectFounder = (bld: CityBuilding) => {
+    audio.playPulse();
+    onSectionChange('city');
+    onCategoryChange?.('all');
+    setTimeout(() => {
+      onSelectBuilding?.(bld);
+    }, 100);
+    setSearchQuery('');
+    setIsFocused(false);
+  };
+
+  // Static shortcuts for empty query search overlay
+  const quickSuggestions = [
+    { type: 'startup', label: 'ATP Core Lab', bld: INITIAL_CITY_BUILDINGS.find(b => b.id === 'bld-core') },
+    { type: 'sector', label: 'Deep Tech & AI', value: 'Deep Tech & AI' },
+    { type: 'founder', label: 'Priya Anant', bld: INITIAL_CITY_BUILDINGS.find(b => b.founder === 'Priya Anant') }
+  ];
 
   const navNodes: NavNode[] = [
     { id: 'hero', label: 'Ecosystem Core', shortLabel: 'Core', icon: Compass, glowColor: 'rgba(255, 106, 0, 0.5)' },
@@ -68,11 +159,188 @@ export const OrbNavigation: React.FC<OrbNavigationProps> = ({
 
   return (
     <>
-      {/* Sound System & Global Header Coordinates */}
-      <div className="fixed top-6 left-6 right-6 flex justify-end items-center z-40 select-none font-mono">
+      {/* Sound System & Global Header Coordinates & Custom Live Search */}
+      <div className="fixed top-6 left-6 right-6 flex items-start justify-between gap-4 z-40 select-none font-mono pointer-events-none">
+        
+        {/* Core Search HUD Integration (Left/Center biased) */}
+        <div ref={searchRef} className="relative flex flex-col pointer-events-auto">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                if (e.target.value) {
+                  audio.playTick();
+                }
+              }}
+              onFocus={() => setIsFocused(true)}
+              placeholder="SEARCH CORE NETWORK..."
+              className="bg-black/60 border border-white/10 text-[10px] tracking-widest text-white placeholder-white/30 rounded-full pl-9 pr-9 py-2 w-48 sm:w-64 focus:w-56 sm:focus:w-80 focus:bg-black/90 focus:border-orange-500/50 focus:shadow-[0_0_15px_rgba(255,106,0,0.15)] outline-none transition-all duration-300"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => {
+                  audio.playTick();
+                  setSearchQuery('');
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-3 h-3 text-white/40 hover:text-white" />
+              </button>
+            )}
+          </div>
 
-        <div className="flex items-center gap-6">
-          <span className="text-[10px] text-white/30 tracking-[0.2em] hidden sm:inline-block">
+          {/* Search Dropdown Panel */}
+          <AnimatePresence>
+            {isFocused && (searchQuery || quickSuggestions.length > 0) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute top-11 left-0 w-64 sm:w-80 max-h-[350px] bg-black/95 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-2.5 overflow-y-auto scrollbar-thin z-[100]"
+                id="hud-search-dropdown"
+              >
+                {/* Header status bar */}
+                <div className="flex justify-between items-center px-1.5 pb-1.5 mb-1.5 border-b border-white/5 text-[8px] font-bold text-white/30 tracking-[0.25em] uppercase">
+                  <span>{searchQuery ? 'SEARCH RESULTS' : 'QUICK SHORTCUTS'}</span>
+                  {searchQuery && (
+                    <span className="text-orange-500 font-semibold">
+                      {totalResultsCount} FOUND
+                    </span>
+                  )}
+                </div>
+
+                {/* Empty / Suggestions state */}
+                {!searchQuery && (
+                  <div className="space-y-1.5 py-1">
+                    <p className="text-[8px] text-white/30 uppercase tracking-widest px-1.5 mb-1">SOVEREIGN RECOMMENDATIONS:</p>
+                    {quickSuggestions.map((suggestion, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          if (suggestion.type === 'startup' && suggestion.bld) {
+                            handleSelectStartup(suggestion.bld);
+                          } else if (suggestion.type === 'sector' && suggestion.value) {
+                            handleSelectSector(suggestion.value);
+                          } else if (suggestion.type === 'founder' && suggestion.bld) {
+                            handleSelectFounder(suggestion.bld);
+                          }
+                        }}
+                        className="w-full flex justify-between items-center text-left py-1.5 px-2 rounded hover:bg-white/5 text-[9px] text-white/70 hover:text-orange-400 transition-all cursor-pointer group"
+                      >
+                        <span className="font-semibold text-[10px]">{suggestion.label}</span>
+                        <span className={`text-[7px] border uppercase px-1 py-0.5 rounded ${
+                          suggestion.type === 'startup' ? 'border-orange-500/20 bg-orange-500/5 text-orange-400' :
+                          suggestion.type === 'sector' ? 'border-cyan-500/20 bg-cyan-500/5 text-cyan-400' :
+                          'border-emerald-500/20 bg-emerald-500/5 text-emerald-400'
+                        }`}>
+                          {suggestion.type}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Matches layout */}
+                {searchQuery && totalResultsCount === 0 && (
+                  <div className="py-6 text-center text-[10px] text-white/40 tracking-wider">
+                    NO COMPATIBLE ENTITIES FOUND
+                  </div>
+                )}
+
+                {searchQuery && totalResultsCount > 0 && (
+                  <div className="space-y-3.5 py-1">
+                    {/* Startup segment matches */}
+                    {matchingStartups.length > 0 && (
+                      <div>
+                        <div className="text-[7.5px] font-bold text-orange-500/70 tracking-[0.2em] uppercase px-1.5 mb-1 font-mono">
+                          // STARTUPS
+                        </div>
+                        <div className="space-y-0.5">
+                          {matchingStartups.map(bld => (
+                            <button
+                              key={bld.id}
+                              onClick={() => handleSelectStartup(bld)}
+                              className="w-full flex justify-between items-center text-left py-1.5 px-2 rounded hover:bg-white/5 text-[10px] text-white/80 hover:text-orange-400 transition-all cursor-pointer group"
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-semibold">{bld.name}</span>
+                                <span className="text-[8px] text-white/40 group-hover:text-white/60 line-clamp-1">{bld.tagline}</span>
+                              </div>
+                              <span className="text-[7px] border border-orange-500/20 px-1 py-0.5 rounded bg-orange-500/5 text-orange-500 ml-2 shrink-0">
+                                ENTER
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sector matches */}
+                    {matchingSectors.length > 0 && (
+                      <div>
+                        <div className="text-[7.5px] font-bold text-cyan-400/70 tracking-[0.2em] uppercase px-1.5 mb-1 font-mono">
+                          // SECTORS
+                        </div>
+                        <div className="space-y-0.5">
+                          {matchingSectors.map(sec => (
+                            <button
+                              key={sec}
+                              onClick={() => handleSelectSector(sec)}
+                              className="w-full flex justify-between items-center text-left py-1.5 px-2 rounded hover:bg-white/5 text-[10px] text-white/80 hover:text-cyan-400 transition-all cursor-pointer group"
+                            >
+                              <span>{sec}</span>
+                              <span className="text-[7px] border border-cyan-500/20 px-1 py-0.5 rounded bg-cyan-500/5 text-cyan-400 ml-2 shrink-0">
+                                FILTER
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Founder matches */}
+                    {matchingFounders.length > 0 && (
+                      <div>
+                        <div className="text-[7.5px] font-bold text-emerald-400/70 tracking-[0.2em] uppercase px-1.5 mb-1 font-mono">
+                          // FOUNDERS
+                        </div>
+                        <div className="space-y-0.5">
+                          {matchingFounders.map(bld => (
+                            <button
+                              key={bld.id}
+                              onClick={() => handleSelectFounder(bld)}
+                              className="w-full flex justify-between items-center text-left py-1.5 px-2 rounded hover:bg-white/5 text-[10px] text-white/80 hover:text-emerald-400 transition-all cursor-pointer group"
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-semibold">{bld.founder}</span>
+                                <span className="text-[8px] text-white/40 group-hover:text-white/60">{bld.name}</span>
+                              </div>
+                              <span className="text-[7px] border border-emerald-500/20 px-1 py-0.5 rounded bg-emerald-500/5 text-emerald-400 ml-2 shrink-0">
+                                VIEW
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Center-aligned Dynamic Earth-grounded Tech News Telemetry */}
+        <div className="hidden md:flex items-center flex-1 max-w-sm lg:max-w-xl mx-4 pointer-events-auto">
+          <DailyBriefingTicker />
+        </div>
+
+        {/* HUD Sound & Settings (Right-aligned, interactive) */}
+        <div className="flex items-center gap-6 pointer-events-auto">
+          <span className="text-[10px] text-white/30 tracking-[0.2em] hidden md:inline-block">
             LAT: 14.6819° N / LONG: 77.6006° E
           </span>
           
